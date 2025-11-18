@@ -1,0 +1,85 @@
+import csv
+
+
+class Node:
+    def __init__(self, task_name, duration, priority):
+        self.task_name = task_name
+        self.duration = duration
+        self.priority = priority
+        self.next = None
+class LinkedList:
+    def __init__(self):
+        self.head = None
+        self.tail = None
+        self.length = 0
+    def addtask(self, task_name, duration, priority):
+        node = Node(task_name, duration, priority)
+        if self.head is None:
+            self.head = self.tail = node
+        else:
+            self.tail.next = node
+            self.tail = node
+        self.length += 1
+    def removetask(self, task_name):
+        current = self.head
+        previous = None
+        while current is not None and current.task_name != task_name:
+            previous = current
+            current = current.next
+        if previous is None:
+            self.head = current.next
+        if current is None :
+            return 'kan niet'
+        else:
+            previous.next = current.next
+    def displaytasks(self):
+        current = self.head
+        while current is not None:
+            print(current.task_name)
+            current = current.next
+    def findtask(self, task_name):
+        current = self.head
+        while current is not None:
+            if current.task_name == task_name:
+                return current.task_name
+            current = current.next
+        return 'kan niet'
+
+    def calctotduration(self):
+        current = self.head
+        duration = 0
+        while current is not None:
+            duration += current.duration
+            current = current.next
+
+    def readtaskfromcsv(self,filea):
+        file = open(filea, 'r')
+        readfile = csv.reader(file)
+        next(readfile)
+        for row in readfile:
+            task_name = row[0]
+            duration = int(row[1])
+            priority = int(row[2])
+            self.addtask(task_name, duration, priority)
+
+    def sorterdinsertbypriority(self,head,node):
+        if head is None or head.priority > node.priority:
+            node.next = head
+            return node
+        current = head
+        while current.next is not None and current.priority < node.priority:
+            current = current.next
+        node.next = current.next
+        current.next = node
+        return head
+
+    def reordertaskbypriority(self):
+        current = self.head
+        nieuwelijst = None
+        while current is not None:
+            temp = current.next
+            nieuwelijst = self.sorterdinsertbypriority(nieuwelijst,current)
+            current = temp
+        self.head = nieuwelijst
+
+
