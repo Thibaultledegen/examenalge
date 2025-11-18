@@ -1,0 +1,88 @@
+# -----------------------------
+#   Order class
+# -----------------------------
+class Order:
+    def __init__(self, customer_name, items):
+        self.customer_name = customer_name
+        self.items = items
+
+    def __str__(self):
+        return f"{self.customer_name}: {self.items}"
+
+
+# -----------------------------
+#   OrderQueue class (FIFO) met list
+# -----------------------------
+class OrderQueue:
+    def __init__(self):
+        self.queue = []  # gewone Python lijst
+
+    def enqueue(self, order):
+        """Voeg bestelling toe aan het einde van de lijst."""
+        self.queue.append(order)
+
+    def dequeue(self):
+        """Verwijder en geef het eerste element terug (FIFO)."""
+        if self.is_empty():
+            print("No orders to process.")
+            return None
+        return self.queue.pop(0)  # verwijder eerste element
+
+    def peek(self):
+        """Bekijk het eerste element zonder te verwijderen."""
+        if self.is_empty():
+            return None
+        return self.queue[0]
+
+    def is_empty(self):
+        return len(self.queue) == 0
+
+    def size(self):
+        return len(self.queue)
+
+    def print_queue(self):
+        if self.is_empty():
+            print("Queue is empty.")
+            return
+        print("--- Orders in queue ---")
+        for order in self.queue:
+            print(order)
+
+    def cancel_order(self, customer_name):
+        """Verwijder bestelling van een specifieke klant."""
+        new_queue = []
+        found = False
+        for order in self.queue:
+            if order.customer_name == customer_name:
+                found = True
+                continue
+            new_queue.append(order)
+        self.queue = new_queue
+        if not found:
+            print(f"No order found for {customer_name}")
+
+
+# -----------------------------
+#   TEST OF THE QUEUE
+# -----------------------------
+q = OrderQueue()
+
+# Bestellingen komen toe
+q.enqueue(Order("Anna", ["fries", "cola"]))
+q.enqueue(Order("Bram", ["burger"]))
+q.enqueue(Order("Chloe", ["ice cream", "water"]))
+
+q.print_queue()
+
+print("\nProcessing order:", q.dequeue())
+print("Processing order:", q.dequeue())
+
+print("\nOrders still waiting:")
+q.print_queue()
+
+print("\nQueue size:", q.size())
+print("Next order:", q.peek())
+
+print("\nCancelling Chloe's order...")
+q.cancel_order("Chloe")
+q.print_queue()
