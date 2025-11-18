@@ -1,0 +1,83 @@
+# ---------------------------------------
+#   BrowserHistoryStack class (LIFO)
+# ---------------------------------------
+class BrowserHistoryStack:
+    def __init__(self):
+        self.stack = []    # interne opslag, lijst gedraagt zich als stack
+
+    def visit(self, page):
+        """
+        Bezoek een nieuwe pagina.
+        Deze pagina wordt bovenop de stack gelegd.
+        (LIFO → laatste bezochte pagina is de 'top' van de stack)
+        """
+        self.stack.append(page)
+
+    def back(self):
+        """
+        Ga terug naar de vorige pagina.
+        pop() haalt de bovenste pagina weg en geeft die terug.
+        Als de stack leeg is → geen pagina om terug te gaan.
+        """
+        if self.is_empty():
+            print("No previous page.")
+            return None
+        return self.stack.pop()
+
+    def peek(self):
+        """
+        Geeft de huidige pagina (top van de stack) zonder te verwijderen.
+        """
+        if self.is_empty():
+            return None
+        return self.stack[-1]  # laatste element
+
+    def is_empty(self):
+        """
+        True als er geen pagina's meer in de geschiedenis zitten.
+        """
+        return len(self.stack) == 0
+
+    def size(self):
+        """
+        Geeft aantal pagina's dat in de geschiedenis staat.
+        """
+        return len(self.stack)
+
+    def print_history(self):
+        """
+        Print alle bezochte pagina's in de volgorde waarin ze bezocht zijn.
+        Bovenste van de stack wordt als laatste getoond.
+        """
+        if self.is_empty():
+            print("History is empty.")
+            return
+
+        print("--- Browser history ---")
+        for page in self.stack:
+            print(page)
+
+# ------------------------------
+#   TEST DE STACK
+# ------------------------------
+history = BrowserHistoryStack()
+
+history.visit("google.com")        # stapel: [google.com]
+history.visit("youtube.com")       # stapel: [google.com, youtube.com]
+history.visit("python.org")        # stapel: [google.com, youtube.com, python.org]
+
+history.print_history()
+
+print("\nCurrent page:", history.peek())  # python.org
+
+print("\nGoing back:", history.back())    # pop → python.org
+print("Going back:", history.back())      # pop → youtube.com
+
+print("\nCurrent page:", history.peek())  # google.com
+
+print("\nHistory size:", history.size())
+
+print("\nGoing back:", history.back())    # pop → google.com
+
+print("\nHistory after all pops:")
+history.print_history()                    # empty
