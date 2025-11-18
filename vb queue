@@ -1,0 +1,120 @@
+from collections import deque  # We import deque, een snelle queue-structuur
+# -----------------------------
+#   Order class
+# -----------------------------
+class Order:
+    def __init__(self, customer_name, items):
+        self.customer_name = customer_name  # Naam van de klant
+        self.items = items  # Liste met items die klant bestelt
+
+    def __str__(self):
+        return f"{self.customer_name}: {self.items}"  # Hoe je de bestelling afbeeldt
+
+
+# -----------------------------
+#   OrderQueue class (FIFO)
+# -----------------------------
+class OrderQueue:
+    def __init__(self):
+        self.queue = deque()  # Maak een lege deque (queue)
+
+    def enqueue(self, order):
+        """
+        Voeg bestelling toe aan de achterkant van de queue.
+        FIFO: wie als eerste komt, wordt als eerste geholpen.
+        """
+        self.queue.append(order)
+
+    def dequeue(self):
+        """
+        Haalt de eerste bestelling uit de queue.
+        We gebruiken popleft() → verwijdert van de LINKER kant (FIFO).
+        """
+        if self.is_empty():
+            print("No orders to process.")
+            return None
+        return self.queue.popleft()  # eerste element eruit
+
+    def peek(self):
+        """
+        Kijk naar de eerste bestelling, zonder die te verwijderen.
+        Dit gebruiken we om te weten wie als volgende wordt geholpen.
+        """
+        if self.is_empty():
+            return None
+        return self.queue[0]  # eerste element bekijken
+
+    def is_empty(self):
+        """
+        True als queue leeg is, anders False.
+        """
+        return len(self.queue) == 0
+
+    def size(self):
+        """
+        Aantal bestellingen in de queue.
+        """
+        return len(self.queue)
+
+    def print_queue(self):
+        """
+        Print alle orders in FIFO volgorde.
+        Van eerst toegekomen → laatst toegekomen.
+        """
+        if self.is_empty():
+            print("Queue is empty.")
+            return
+
+        print("--- Orders in queue ---")
+        for order in self.queue:
+            print(order)
+
+    def cancel_order(self, customer_name):
+        """
+        Verwijder een bestelling van een bepaalde klant.
+        FIFO moet behouden blijven.
+        → Dus we maken een nieuwe queue zonder die klant.
+        """
+        new_queue = deque()
+        found = False
+
+        while self.queue:
+            order = self.queue.popleft()
+            if order.customer_name == customer_name:
+                found = True
+                continue  # sla deze bestelling over
+            new_queue.append(order)
+
+        self.queue = new_queue
+
+        if not found:
+            print(f"No order found for {customer_name}")
+
+
+# -----------------------------
+#   TEST OF THE QUEUE
+# -----------------------------
+q = OrderQueue()
+
+# Bestellingen komen toe
+q.enqueue(Order("Anna", ["fries", "cola"]))     # Anna komt eerst
+q.enqueue(Order("Bram", ["burger"]))            # Dan Bram
+q.enqueue(Order("Chloe", ["ice cream", "water"]))  # Dan Chloe
+
+q.print_queue()  # toon alle bestellingen
+
+print("\nProcessing order:", q.dequeue())  # Anna wordt geholpen
+print("Processing order:", q.dequeue())    # Bram wordt geholpen
+
+print("\nOrders still waiting:")
+q.print_queue()  # Alleen Chloe nog in queue
+
+print("\nQueue size:", q.size())   # 1
+print("Next order:", q.peek())     # Chloe
+
+print("\nCancelling Chloe's order...")
+q.cancel_order("Chloe")  # Chloe wordt geschrapt
+
+q.print_queue()  # Queue is nu leeg
+
+
