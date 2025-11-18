@@ -1,0 +1,31 @@
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self, item):
+        """Leg item bovenop de stack (LIFO)."""
+        self.items.append(item)
+
+    def pop(self):
+        """Neem het bovenste item af."""
+        if self.is_empty():
+            print("Stack is empty.")
+            return None
+        return self.items.pop()
+
+    def peek(self):
+        """Bekijk het bovenste element zonder te verwijderen."""
+        if self.is_empty():
+            return None
+        return self.items[-1]
+
+    def is_empty(self):
+        return len(self.items) == 0
+
+    def size(self):
+        return len(self.items)
+
+    def print_stack(self):
+        print("Stack (top first):")
+        for item in reversed(self.items):
+            print(item)
