@@ -1,0 +1,164 @@
+class Player:
+    def __init__(self, name : str, number : int):
+        self.name = name
+        self.number = number
+
+    def __eq__(self, other):
+        if isinstance(other, Player):
+            return other.name == self.name
+        else:
+            return False
+
+    def __lt__(self, other):
+        if isinstance(other, Player):
+            return self.number < other.number
+        else:
+            return NotImplemented
+
+    def __str__(self):
+        return f"{self.name} ({self.number})"
+#test
+ll = Player("x", 1)
+ll2 = Player("c", 2)
+ll3 = Player("e", 3)
+
+players = [ll, ll2, ll3]
+
+print(ll)
+print(ll < ll2)  # True
+print(ll == ll3) # False
+
+print(sorted(players))
+
+class Pass:
+    def __init__(self, sender, receiver, nr_of_times):
+        self.sender = sender
+        self.receiver = receiver
+        self.nr_of_times = nr_of_times
+
+    def getweight(self):
+        return self.nr_of_times
+
+    def getstart(self):
+        return self.sender
+
+    def getend(self):
+        return self.receiver
+
+    def __eq__(self, other):
+        if isinstance(other, Pass):
+            return self.sender == other.sender and self.receiver == other.receiver
+        else:
+            return False
+
+    def __str__(self):
+        return f"Pass from <{self.sender}> to <{self.receiver}>"
+#test
+
+ll = Player("x", 1)
+ll2 = Player("c", 2)
+ll3 = Player("e", 3)
+
+kk = Pass(ll, ll2, 3)
+ww = Pass(ll, ll3, 3)
+aa = Pass(ll, ll3, 3)
+
+print(kk)
+
+print(kk == ww)
+print(ww == aa)
+
+print(kk.getweight())
+
+class PassGraph:
+    def __init__(self):
+        self.players = []
+        self.adj = {}
+
+    def add_player(self, player):
+        for p in self.players:
+            if p.name == player.name:
+                return
+        self.players.append(player)
+        self.adj[player.name] = []
+
+
+    def has_player(self, speler):
+        if isinstance(speler, Player):
+            for p in self.players:
+                if p.name == speler:
+                    return True
+
+        return False
+
+    def get_player(self, name):
+        for p in self.players:
+            if p.name == name:
+                return p
+        return None
+
+    def add_pass(self, sender, receiver, times=1):
+        if times <= 0 or sender not in self.players or receiver not in self.players:
+            return None
+        sender_name = sender.name
+        receiver_name = receiver.name
+
+        for pas in self.adj[sender_name]:
+            if pas.receiver.name == receiver_name and pas.sender.name == sender_name:
+                pas.nr_of_times += times
+
+        self.adj[sender_name].append(Pass(sender, receiver, times))
+
+    def get_pass(self, sender_name, receiver_name):
+        if sender_name not in self.adj:
+            return None
+        for pas in self.adj[sender_name]:
+            if pas.receiver.name == receiver_name and pas.sender.name == sender_name:
+                return pas
+        return None
+
+    def neighbors(self, sender_name):
+        return self.adj.get(sender_name, [])
+
+    # ---------- ANALYSE ----------
+    def total_weight(self, subset=None):
+        if subset is None:
+            subset = [p.name for p in self.players]
+
+        totaal = 0
+        for sender in subset:
+            if sender in self.adj:
+                for pas in self.adj[sender]:
+                    if pas.receiver.name in subset:
+                        totaal += pas.nr_of_times
+        return totaal
+
+    def pass_intensity(self, subset=None):
+        if subset is None:
+            subset = [p.name for p in self.players]
+
+        n = len(subset)
+        if n < 2:
+            return 0.0
+
+        numerator = self.total_weight(subset)
+        denominator = n * (n - 1)
+
+        return numerator / denominator
+
+    def top_pairs(self, k=5):
+        alle = []
+        for lijst in self.adj.values():
+            alle.extend(lijst)
+
+        alle.sort()
+        return alle[:k]
+
+    def distribution_from(self, sender_name):
+        if sender_name not in self.adj:
+            return []
+
+        data = [(p.receiver.name, p.nr_of_times) for p in self.adj[sender_name]]
+        data.sort(key=lambda x: x[1], reverse=True)
+        return data
+
